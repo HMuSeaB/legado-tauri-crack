@@ -122,6 +122,15 @@ pub fn generate_handler() -> impl Fn(tauri::ipc::Invoke<tauri::Wry>) -> bool + S
                 invoke.resolver.resolve(serde_json::json!([]));
                 true
             }
+            "booksource_import_legacy_json_url" | "booksource_import_legacy_json_text" => {
+                invoke.resolver.resolve(serde_json::json!({
+                    "imported": 1,
+                    "skipped": 0,
+                    "files": ["mock_imported_source.js"],
+                    "errors": []
+                }));
+                true
+            }
             "list_user_fonts" => {
                 invoke.resolver.resolve(serde_json::json!([]));
                 true
