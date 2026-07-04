@@ -16,8 +16,8 @@ pub mod web_server;
 pub mod system;
 pub mod http_cmd;
 
-pub fn generate_handler() -> Box<dyn Fn(tauri::ipc::Invoke<tauri::Wry>) -> bool> {
-    Box::new(|_| false)
+pub fn generate_handler() -> impl Fn(tauri::ipc::Invoke<tauri::Wry>) -> bool + Send + Sync + 'static {
+    |_| false
 }
 
 /// 全部命令名 (从 .so 二进制提取)

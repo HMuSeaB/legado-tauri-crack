@@ -169,6 +169,10 @@ axum = "0.8"
 wry = "0.55"
 tao = "0.35"
 anyhow = "1.0"
+tauri-plugin-dialog = "2.0"
+tauri-plugin-fs = "2.0"
+tauri-plugin-opener = "2.0"
+
 
 
 [profile.release]

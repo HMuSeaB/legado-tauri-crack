@@ -86,12 +86,6 @@ pub struct BaseReq {
     // 从二进制提取到 2 个字段，具体字段名见下方注释
     // 字段名候选 (camelCase): 从 .so 提取
 }
-/// BookInfoReq (4 个字段)
-#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
-pub struct BookInfoReq {
-    // 从二进制提取到 4 个字段，具体字段名见下方注释
-    // 字段名候选 (camelCase): 从 .so 提取
-}
 /// BrowserBridgeMessage (7 个字段)
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct BrowserBridgeMessage {
