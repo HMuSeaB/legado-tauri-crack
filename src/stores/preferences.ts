@@ -148,14 +148,14 @@ export const usePreferencesStore = defineStore("preferences", () => {
     version: 2,
     defaults: () => ({
       vConsoleEnabled: false,
-      fullModeEnabled: false,
+      fullModeEnabled: true,
     }),
     migrate: ({ storedVersion, storedData }) => {
       if (storedVersion === 1) {
         const old = (storedData ?? {}) as Partial<DevToolsPreferences>;
         return {
           vConsoleEnabled: old.vConsoleEnabled ?? false,
-          fullModeEnabled: false,
+          fullModeEnabled: true,
         };
       }
       return null;
