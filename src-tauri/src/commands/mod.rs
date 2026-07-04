@@ -28,7 +28,7 @@ pub fn generate_handler() -> impl Fn(tauri::ipc::Invoke<tauri::Wry>) -> bool + S
                 true
             }
             "app_config_get_all" => {
-                invoke.resolver.resolve(serde_json::json!({
+                let default_cfg: serde_json::Value = serde_json::from_str(r#"{
                     "http_user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
                     "http_follow_redirects": true,
                     "http_connect_timeout_secs": 10,
@@ -110,7 +110,8 @@ pub fn generate_handler() -> impl Fn(tauri::ipc::Invoke<tauri::Wry>) -> bool + S
                     "sync_mobile_startup_delay_ms": 5000,
                     "sync_mobile_resume_delay_ms": 1500,
                     "sync_baidu_app_name": "legado-tauri"
-                }));
+                }"#).unwrap();
+                invoke.resolver.resolve(default_cfg);
                 true
             }
             "bookshelf_list" => {
