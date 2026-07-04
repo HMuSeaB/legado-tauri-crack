@@ -75,8 +75,8 @@ impl<'a> Drop for EngineGuard<'a> {
 /// 执行 JS 代码 (对应命令: js_eval)
 pub fn js_eval(code: &str) -> anyhow::Result<String> {
     let mut ctx = Context::default();
-    let result = ctx.eval(Source::from_bytes(code))?;
-    Ok(result.to_string(&mut ctx)?.to_std_string_escaped())
+    let result = ctx.eval(Source::from_bytes(code)).map_err(|e| anyhow::anyhow!("JsError: {:?}", e))?;
+    Ok(result.to_string(&mut ctx).map_err(|e| anyhow::anyhow!("JsError: {:?}", e))?.to_std_string_escaped())
 }
 
 /// 执行书源规则
@@ -86,7 +86,7 @@ pub fn eval_booksource(rule: &str, html: &str) -> anyhow::Result<String> {
     let html_var = format!("{}", html);  // 简化: 实际用 JsValue::string
     ctx.eval(Source::from_bytes(&format!(
         "var html = {}; var result = (function() { {} })();", rule
-    )))?;
-    let result = ctx.eval(Source::from_bytes("result"))?;
-    Ok(result.to_string(&mut ctx)?.to_std_string_escaped())
+    ))).map_err(|e| anyhow::anyhow!("JsError: {:?}", e))?;
+    let result = ctx.eval(Source::from_bytes("result")).map_err(|e| anyhow::anyhow!("JsError: {:?}", e))?;
+    Ok(result.to_string(&mut ctx).map_err(|e| anyhow::anyhow!("JsError: {:?}", e))?.to_std_string_escaped())
 }
