@@ -16,7 +16,55 @@ pub mod web_server;
 pub mod system;
 
 pub fn generate_handler() -> impl Fn(tauri::ipc::Invoke<tauri::Wry>) -> bool + Send + Sync + 'static {
-    |_| false
+    |invoke| {
+        let cmd = invoke.message.command();
+        match cmd {
+            "extension_list" => {
+                invoke.resolver.resolve(serde_json::json!([]));
+                true
+            }
+            "app_config_get_all" => {
+                invoke.resolver.resolve(serde_json::json!({}));
+                true
+            }
+            "bookshelf_list" => {
+                invoke.resolver.resolve(serde_json::json!([]));
+                true
+            }
+            "list_user_fonts" => {
+                invoke.resolver.resolve(serde_json::json!([]));
+                true
+            }
+            "get_local_ips" => {
+                invoke.resolver.resolve(serde_json::json!([]));
+                true
+            }
+            "sync_get_status" => {
+                invoke.resolver.resolve(serde_json::json!({
+                    "status": "idle"
+                }));
+                true
+            }
+            _ => {
+                if cmd.starts_with("app_config_") 
+                    || cmd.starts_with("bookshelf_") 
+                    || cmd.starts_with("booksource_")
+                    || cmd.starts_with("extension_")
+                    || cmd.starts_with("sync_")
+                    || cmd.starts_with("web_server_")
+                    || cmd.starts_with("frontend_")
+                    || cmd.starts_with("audio_")
+                    || cmd.starts_with("cover_")
+                    || cmd.starts_with("tts_")
+                {
+                    invoke.resolver.resolve(serde_json::json!(null));
+                    true
+                } else {
+                    false
+                }
+            }
+        }
+    }
 }
 
 /// 全部命令名 (从 .so 二进制提取)
