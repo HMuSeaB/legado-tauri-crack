@@ -148,7 +148,7 @@ pub fn generate_handler() -> impl Fn(tauri::ipc::Invoke<tauri::Wry>) -> bool + S
                     || cmd.starts_with("cover_")
                     || cmd.starts_with("tts_")
                 {
-                    invoke.resolver.resolve(serde_json::json!(null));
+                    invoke.resolver.resolve(serde_json::json!([]));
                     true
                 } else {
                     false
