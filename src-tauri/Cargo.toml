@@ -150,11 +150,11 @@ path = "src/main.rs"
 # zopfli-0.8.3
 
 # 主要依赖 (整理后):
-tauri = { version = "2.11", features = ["protocol-asset"] }
+tauri = { version = "2.11", features = [] }
 boa_engine = "0.21"
 boa_parser = "0.21"
 boa_ast = "0.21"
-reqwest = { version = "0.13", features = ["json","cookies","stream","socks"] }
+reqwest = { version = "0.13", features = ["json", "cookies", "stream", "socks"] }
 rustls = "0.23"
 ring = "0.17"
 redb = "4"
@@ -168,6 +168,8 @@ moka = { version = "0.12", features = ["sync"] }
 axum = "0.8"
 wry = "0.55"
 tao = "0.35"
+anyhow = "1.0"
+
 
 [profile.release]
 opt-level = 3
