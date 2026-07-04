@@ -14,7 +14,6 @@ pub mod bookshelf;
 pub mod tts;
 pub mod web_server;
 pub mod system;
-pub mod http_cmd;
 
 pub fn generate_handler() -> impl Fn(tauri::ipc::Invoke<tauri::Wry>) -> bool + Send + Sync + 'static {
     |_| false

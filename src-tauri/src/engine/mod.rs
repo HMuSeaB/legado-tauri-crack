@@ -85,7 +85,7 @@ pub fn eval_booksource(rule: &str, html: &str) -> anyhow::Result<String> {
     // 注入 HTML 和工具函数到 Boa 上下文
     let html_var = format!("{}", html);  // 简化: 实际用 JsValue::string
     ctx.eval(Source::from_bytes(&format!(
-        "var html = {}; var result = (function() { {} })();", rule
+        "var html = {{}}; var result = (function() {{ {} }})();", rule
     ))).map_err(|e| anyhow::anyhow!("JsError: {:?}", e))?;
     let result = ctx.eval(Source::from_bytes("result")).map_err(|e| anyhow::anyhow!("JsError: {:?}", e))?;
     Ok(result.to_string(&mut ctx).map_err(|e| anyhow::anyhow!("JsError: {:?}", e))?.to_std_string_escaped())
