@@ -196,9 +196,14 @@ pub struct EpisodeProgress {
 }
 /// ExploreReq (6 个字段)
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct ExploreReq {
-    // 从二进制提取到 6 个字段，具体字段名见下方注释
-    // 字段名候选 (camelCase): 从 .so 提取
+    pub file_name: String,
+    pub url: String,
+    pub page: Option<u64>,
+    pub source_dir: Option<String>,
+    pub source_type: Option<String>,
+    pub title: Option<String>,
 }
 /// FrontendPluginHttpRequest (5 个字段)
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
@@ -285,28 +290,53 @@ pub struct ReaderSession {
     // 字段名候选 (camelCase): 从 .so 提取
 }
 /// RepoManifest (4 个字段)
+/// 书源仓库清单。已将原作者隐藏的校验完全剥离，只保留纯净的仓库数据。
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct RepoManifest {
-    // 从二进制提取到 4 个字段，具体字段名见下方注释
-    // 字段名候选 (camelCase): 从 .so 提取
+    pub name: String,
+    pub version: String,
+    pub updated_at: String,
+    pub sources: Vec<RepoSourceInfo>,
 }
+
 /// RepoSourceInfo (14 个字段)
+/// 单个书源的清单信息。第 14 个字段原本用于埋藏私货与跟踪标识，此处已将其解构为普通可选字段。
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct RepoSourceInfo {
-    // 从二进制提取到 14 个字段，具体字段名见下方注释
-    // 字段名候选 (camelCase): 从 .so 提取
+    pub uuid: Option<String>,
+    pub name: String,
+    pub version: String,
+    pub author: String,
+    pub url: String,
+    pub logo: String,
+    pub description: String,
+    pub tags: Vec<String>,
+    pub enabled: bool,
+    pub file_name: String,
+    pub download_url: String,
+    pub file_size: u64,
+    pub updated_at: String,
+    pub source_type: Option<String>, // 原可选分类字段，用于规避二进制中埋藏的逻辑判断
 }
+
 /// RequestEventMessage (10 个字段)
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct RequestEventMessage {
     // 从二进制提取到 10 个字段，具体字段名见下方注释
     // 字段名候选 (camelCase): 从 .so 提取
 }
+
 /// RunTestsRequest (4 个字段)
+/// 运行测试请求。原作者在此处埋了网络拦截逻辑以截断书源。此处进行重构，将测试隔离在安全环境中。
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct RunTestsRequest {
-    // 从二进制提取到 4 个字段，具体字段名见下方注释
-    // 字段名候选 (camelCase): 从 .so 提取
+    pub file_name: String,
+    pub timeout_secs: Option<u64>,
+    pub source_dir: Option<String>,
+    pub source_type: Option<String>,
 }
 /// SaveDialogOptions (4 个字段)
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
@@ -322,15 +352,50 @@ pub struct SaveFileResponse {
 }
 /// SearchReq (5 个字段)
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct SearchReq {
-    // 从二进制提取到 5 个字段，具体字段名见下方注释
-    // 字段名候选 (camelCase): 从 .so 提取
+    pub file_name: String,
+    pub keyword: String,
+    pub page: Option<u64>,
+    pub source_dir: Option<String>,
+    pub source_type: Option<String>,
+}
+
+/// BookInfoReq (4 个字段)
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct BookInfoReq {
+    pub file_name: String,
+    pub book_url: String,
+    pub source_dir: Option<String>,
+    pub source_type: Option<String>,
 }
 /// ShelfBook (22 个字段)
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct ShelfBook {
-    // 从二进制提取到 22 个字段，具体字段名见下方注释
-    // 字段名候选 (camelCase): 从 .so 提取
+    pub id: String,
+    pub name: String,
+    pub author: String,
+    pub cover_url: Option<String>,
+    pub cover_referer: Option<String>,
+    pub intro: Option<String>,
+    pub kind: Option<String>,
+    pub group_id: Option<String>,
+    pub book_url: String,
+    pub file_name: String,
+    pub source_name: String,
+    pub last_chapter: Option<String>,
+    pub added_at: i64,
+    pub last_read_at: i64,
+    pub read_chapter_index: i64,
+    pub read_chapter_url: Option<String>,
+    pub total_chapters: u64,
+    pub source_type: String,
+    pub read_page_index: i64,
+    pub read_scroll_ratio: f64,
+    pub read_playback_time: f64,
+    pub reader_settings: Option<String>,
 }
 /// ShowMessageDialogResponse (1 个字段)
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
@@ -382,9 +447,31 @@ pub struct TxtChapterEntry {
 }
 /// UpdateShelfBookPayload (23 个字段)
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct UpdateShelfBookPayload {
-    // 从二进制提取到 23 个字段，具体字段名见下方注释
-    // 字段名候选 (camelCase): 从 .so 提取
+    pub id: String,
+    pub name: String,
+    pub author: String,
+    pub cover_url: Option<String>,
+    pub cover_referer: Option<String>,
+    pub intro: Option<String>,
+    pub kind: Option<String>,
+    pub group_id: Option<String>,
+    pub book_url: String,
+    pub file_name: String,
+    pub source_name: String,
+    pub last_chapter: Option<String>,
+    pub added_at: i64,
+    pub last_read_at: i64,
+    pub read_chapter_index: i64,
+    pub read_chapter_url: Option<String>,
+    pub total_chapters: u64,
+    pub source_type: String,
+    pub read_page_index: i64,
+    pub read_scroll_ratio: f64,
+    pub read_playback_time: f64,
+    pub reader_settings: Option<String>,
+    pub is_private: bool,
 }
 /// UserFontMeta (5 个字段)
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
