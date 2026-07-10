@@ -1,6 +1,9 @@
 //! Tauri IPC 命令注册中心
 //! 从 .so 提取到 210 个命令
 
+use std::sync::OnceLock;
+pub static GLOBAL_APP_HANDLE: OnceLock<tauri::AppHandle> = OnceLock::new();
+
 pub mod booksource;
 pub mod browser_probe;
 pub mod comic;
@@ -119,42 +122,57 @@ pub fn generate_handler() -> impl Fn(tauri::ipc::Invoke<tauri::Wry>) -> bool + S
                 true
             }
             "booksource_list" | "booksource_get_all" => {
-                let app = invoke.resolver.app_handle().clone();
-                tauri::async_runtime::spawn(async move {
-                    match booksource::real_booksource_list(&app).await {
-                        Ok(res) => invoke.resolver.resolve(res),
-                        Err(err) => invoke.resolver.reject(err.to_string()),
-                    }
-                });
-                true
+                if let Some(app) = GLOBAL_APP_HANDLE.get() {
+                    let app = app.clone();
+                    tauri::async_runtime::spawn(async move {
+                        match booksource::real_booksource_list(&app).await {
+                            Ok(res) => invoke.resolver.resolve(res),
+                            Err(err) => invoke.resolver.reject(err.to_string()),
+                        }
+                    });
+                    true
+                } else {
+                    invoke.resolver.reject("App handle not initialized".to_string());
+                    true
+                }
             }
             "booksource_import_legacy_json_url" => {
-                let app = invoke.resolver.app_handle().clone();
-                let payload = invoke.message.payload();
-                let url = payload.get("url").and_then(|v| v.as_str()).unwrap_or("").to_string();
-                let smart_explore = payload.get("smartExploreSubCategories").and_then(|v| v.as_bool()).unwrap_or(false);
-                
-                tauri::async_runtime::spawn(async move {
-                    match booksource::real_import_legacy_json_url(&app, &url, smart_explore).await {
-                        Ok(res) => invoke.resolver.resolve(res),
-                        Err(err) => invoke.resolver.reject(err.to_string()),
-                    }
-                });
-                true
+                if let Some(app) = GLOBAL_APP_HANDLE.get() {
+                    let app = app.clone();
+                    let payload = invoke.message.payload().as_json();
+                    let url = payload.and_then(|p| p.get("url")).and_then(|v| v.as_str()).unwrap_or("").to_string();
+                    let smart_explore = payload.and_then(|p| p.get("smartExploreSubCategories")).and_then(|v| v.as_bool()).unwrap_or(false);
+                    
+                    tauri::async_runtime::spawn(async move {
+                        match booksource::real_import_legacy_json_url(&app, &url, smart_explore).await {
+                            Ok(res) => invoke.resolver.resolve(res),
+                            Err(err) => invoke.resolver.reject(err.to_string()),
+                        }
+                    });
+                    true
+                } else {
+                    invoke.resolver.reject("App handle not initialized".to_string());
+                    true
+                }
             }
             "booksource_import_legacy_json_text" => {
-                let app = invoke.resolver.app_handle().clone();
-                let payload = invoke.message.payload();
-                let content = payload.get("content").and_then(|v| v.as_str()).unwrap_or("").to_string();
-                let smart_explore = payload.get("smartExploreSubCategories").and_then(|v| v.as_bool()).unwrap_or(false);
-                
-                tauri::async_runtime::spawn(async move {
-                    match booksource::real_import_legacy_json_text(&app, &content, smart_explore).await {
-                        Ok(res) => invoke.resolver.resolve(res),
-                        Err(err) => invoke.resolver.reject(err.to_string()),
-                    }
-                });
-                true
+                if let Some(app) = GLOBAL_APP_HANDLE.get() {
+                    let app = app.clone();
+                    let payload = invoke.message.payload().as_json();
+                    let content = payload.and_then(|p| p.get("content")).and_then(|v| v.as_str()).unwrap_or("").to_string();
+                    let smart_explore = payload.and_then(|p| p.get("smartExploreSubCategories")).and_then(|v| v.as_bool()).unwrap_or(false);
+                    
+                    tauri::async_runtime::spawn(async move {
+                        match booksource::real_import_legacy_json_text(&app, &content, smart_explore).await {
+                            Ok(res) => invoke.resolver.resolve(res),
+                            Err(err) => invoke.resolver.reject(err.to_string()),
+                        }
+                    });
+                    true
+                } else {
+                    invoke.resolver.reject("App handle not initialized".to_string());
+                    true
+                }
             }
             "list_user_fonts" => {
                 invoke.resolver.resolve(serde_json::json!([]));

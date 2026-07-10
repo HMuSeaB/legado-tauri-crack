@@ -54,7 +54,10 @@ pub fn run_app() {
         .plugin(tauri_plugin_fs::init())
         .plugin(tauri_plugin_opener::init())
         .invoke_handler(commands::generate_handler())
-        .setup(|_app| Ok(()))
+        .setup(|app| {
+            commands::GLOBAL_APP_HANDLE.set(app.handle().clone()).ok();
+            Ok(())
+        })
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
