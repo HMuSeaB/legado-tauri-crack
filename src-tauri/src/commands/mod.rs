@@ -121,6 +121,10 @@ pub fn generate_handler() -> impl Fn(tauri::ipc::Invoke<tauri::Wry>) -> bool + S
                 invoke.resolver.resolve(serde_json::json!([]));
                 true
             }
+            "booksource_list_streaming" => {
+                invoke.resolver.reject("unknown command booksource_list_streaming".to_string());
+                true
+            }
             "booksource_list" | "booksource_get_all" => {
                 if let Some(app) = GLOBAL_APP_HANDLE.get() {
                     let app = app.clone();
