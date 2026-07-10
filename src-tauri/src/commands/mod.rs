@@ -145,7 +145,12 @@ pub fn generate_handler() -> impl Fn(tauri::ipc::Invoke<tauri::Wry>) -> bool + S
                 }
                 if let Some(app) = GLOBAL_APP_HANDLE.get() {
                     let app = app.clone();
-                    match invoke.message.payload().deserialize::<ImportUrlArgs>() {
+                    let payload_val = match invoke.message.payload() {
+                        tauri::ipc::InvokeBody::Json(v) => v.clone(),
+                        tauri::ipc::InvokeBody::Raw(bytes) => serde_json::from_slice(bytes).unwrap_or(serde_json::Value::Null),
+                        _ => serde_json::Value::Null,
+                    };
+                    match serde_json::from_value::<ImportUrlArgs>(payload_val) {
                         Ok(args) => {
                             let smart_explore = args.smart_explore.unwrap_or(false);
                             tauri::async_runtime::spawn(async move {
@@ -174,7 +179,12 @@ pub fn generate_handler() -> impl Fn(tauri::ipc::Invoke<tauri::Wry>) -> bool + S
                 }
                 if let Some(app) = GLOBAL_APP_HANDLE.get() {
                     let app = app.clone();
-                    match invoke.message.payload().deserialize::<ImportTextArgs>() {
+                    let payload_val = match invoke.message.payload() {
+                        tauri::ipc::InvokeBody::Json(v) => v.clone(),
+                        tauri::ipc::InvokeBody::Raw(bytes) => serde_json::from_slice(bytes).unwrap_or(serde_json::Value::Null),
+                        _ => serde_json::Value::Null,
+                    };
+                    match serde_json::from_value::<ImportTextArgs>(payload_val) {
                         Ok(args) => {
                             let smart_explore = args.smart_explore.unwrap_or(false);
                             tauri::async_runtime::spawn(async move {
