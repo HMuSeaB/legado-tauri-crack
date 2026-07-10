@@ -169,13 +169,14 @@ axum = "0.8"
 wry = "0.55"
 tao = "0.35"
 anyhow = "1.0"
+uuid = { version = "1", features = ["v4"] }
 tauri-plugin-dialog = "2.0"
 tauri-plugin-fs = "2.0"
 tauri-plugin-opener = "2.0"
 parking_lot = "0.12"
 
 [build-dependencies]
-tauri-build = "2.0"
+tauri-build = { version = "2.0", features = [] }
 
 [profile.release]
 opt-level = 3

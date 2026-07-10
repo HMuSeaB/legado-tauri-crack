@@ -118,17 +118,42 @@ pub fn generate_handler() -> impl Fn(tauri::ipc::Invoke<tauri::Wry>) -> bool + S
                 invoke.resolver.resolve(serde_json::json!([]));
                 true
             }
-            "booksource_list" | "booksource_get_all" | "booksource_dirs" => {
-                invoke.resolver.resolve(serde_json::json!([]));
+            "booksource_list" | "booksource_get_all" => {
+                let app = invoke.resolver.app_handle().clone();
+                tauri::async_runtime::spawn(async move {
+                    match booksource::real_booksource_list(&app).await {
+                        Ok(res) => invoke.resolver.resolve(res),
+                        Err(err) => invoke.resolver.reject(err.to_string()),
+                    }
+                });
                 true
             }
-            "booksource_import_legacy_json_url" | "booksource_import_legacy_json_text" => {
-                invoke.resolver.resolve(serde_json::json!({
-                    "imported": 1,
-                    "skipped": 0,
-                    "files": ["mock_imported_source.js"],
-                    "errors": []
-                }));
+            "booksource_import_legacy_json_url" => {
+                let app = invoke.resolver.app_handle().clone();
+                let payload = invoke.message.payload();
+                let url = payload.get("url").and_then(|v| v.as_str()).unwrap_or("").to_string();
+                let smart_explore = payload.get("smartExploreSubCategories").and_then(|v| v.as_bool()).unwrap_or(false);
+                
+                tauri::async_runtime::spawn(async move {
+                    match booksource::real_import_legacy_json_url(&app, &url, smart_explore).await {
+                        Ok(res) => invoke.resolver.resolve(res),
+                        Err(err) => invoke.resolver.reject(err.to_string()),
+                    }
+                });
+                true
+            }
+            "booksource_import_legacy_json_text" => {
+                let app = invoke.resolver.app_handle().clone();
+                let payload = invoke.message.payload();
+                let content = payload.get("content").and_then(|v| v.as_str()).unwrap_or("").to_string();
+                let smart_explore = payload.get("smartExploreSubCategories").and_then(|v| v.as_bool()).unwrap_or(false);
+                
+                tauri::async_runtime::spawn(async move {
+                    match booksource::real_import_legacy_json_text(&app, &content, smart_explore).await {
+                        Ok(res) => invoke.resolver.resolve(res),
+                        Err(err) => invoke.resolver.reject(err.to_string()),
+                    }
+                });
                 true
             }
             "list_user_fonts" => {
