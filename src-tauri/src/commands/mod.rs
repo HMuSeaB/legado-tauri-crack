@@ -137,18 +137,28 @@ pub fn generate_handler() -> impl Fn(tauri::ipc::Invoke<tauri::Wry>) -> bool + S
                 }
             }
             "booksource_import_legacy_json_url" => {
+                #[derive(serde::Deserialize)]
+                struct ImportUrlArgs {
+                    url: String,
+                    #[serde(rename = "smartExploreSubCategories")]
+                    smart_explore: Option<bool>,
+                }
                 if let Some(app) = GLOBAL_APP_HANDLE.get() {
                     let app = app.clone();
-                    let payload = invoke.message.payload().as_json();
-                    let url = payload.and_then(|p| p.get("url")).and_then(|v| v.as_str()).unwrap_or("").to_string();
-                    let smart_explore = payload.and_then(|p| p.get("smartExploreSubCategories")).and_then(|v| v.as_bool()).unwrap_or(false);
-                    
-                    tauri::async_runtime::spawn(async move {
-                        match booksource::real_import_legacy_json_url(&app, &url, smart_explore).await {
-                            Ok(res) => invoke.resolver.resolve(res),
-                            Err(err) => invoke.resolver.reject(err.to_string()),
+                    match invoke.message.payload().deserialize::<ImportUrlArgs>() {
+                        Ok(args) => {
+                            let smart_explore = args.smart_explore.unwrap_or(false);
+                            tauri::async_runtime::spawn(async move {
+                                match booksource::real_import_legacy_json_url(&app, &args.url, smart_explore).await {
+                                    Ok(res) => invoke.resolver.resolve(res),
+                                    Err(err) => invoke.resolver.reject(err.to_string()),
+                                }
+                            });
                         }
-                    });
+                        Err(err) => {
+                            invoke.resolver.reject(format!("Invalid arguments: {}", err));
+                        }
+                    }
                     true
                 } else {
                     invoke.resolver.reject("App handle not initialized".to_string());
@@ -156,18 +166,28 @@ pub fn generate_handler() -> impl Fn(tauri::ipc::Invoke<tauri::Wry>) -> bool + S
                 }
             }
             "booksource_import_legacy_json_text" => {
+                #[derive(serde::Deserialize)]
+                struct ImportTextArgs {
+                    content: String,
+                    #[serde(rename = "smartExploreSubCategories")]
+                    smart_explore: Option<bool>,
+                }
                 if let Some(app) = GLOBAL_APP_HANDLE.get() {
                     let app = app.clone();
-                    let payload = invoke.message.payload().as_json();
-                    let content = payload.and_then(|p| p.get("content")).and_then(|v| v.as_str()).unwrap_or("").to_string();
-                    let smart_explore = payload.and_then(|p| p.get("smartExploreSubCategories")).and_then(|v| v.as_bool()).unwrap_or(false);
-                    
-                    tauri::async_runtime::spawn(async move {
-                        match booksource::real_import_legacy_json_text(&app, &content, smart_explore).await {
-                            Ok(res) => invoke.resolver.resolve(res),
-                            Err(err) => invoke.resolver.reject(err.to_string()),
+                    match invoke.message.payload().deserialize::<ImportTextArgs>() {
+                        Ok(args) => {
+                            let smart_explore = args.smart_explore.unwrap_or(false);
+                            tauri::async_runtime::spawn(async move {
+                                match booksource::real_import_legacy_json_text(&app, &args.content, smart_explore).await {
+                                    Ok(res) => invoke.resolver.resolve(res),
+                                    Err(err) => invoke.resolver.reject(err.to_string()),
+                                }
+                            });
                         }
-                    });
+                        Err(err) => {
+                            invoke.resolver.reject(format!("Invalid arguments: {}", err));
+                        }
+                    }
                     true
                 } else {
                     invoke.resolver.reject("App handle not initialized".to_string());
