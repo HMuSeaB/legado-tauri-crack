@@ -233,6 +233,7 @@ pub fn generate_handler() -> impl Fn(tauri::ipc::Invoke<tauri::Wry>) -> bool + S
                     || cmd.starts_with("audio_")
                     || cmd.starts_with("cover_")
                     || cmd.starts_with("tts_")
+                    || cmd.starts_with("browser_probe_")
                 {
                     invoke.resolver.resolve(serde_json::json!([]));
                     true
